@@ -50,25 +50,76 @@ class User
     end
   end
 
-  def ls
-
+  def ls args
+    if !args.empty? && args.first.strip == "-a"
+      @list.each { |l| puts "#{l[:slug]}"}
+    else
+      @list.each { |l| puts "#{l[:slug]}" unless l[:hidden] == true}
+    end
   end
 
-  def cat
-
+  def cat args
+    elem = @list.select { |l| l[:slug] == args.first and l[:kind] == :file }
+    if !elem.blank?
+      if elem.first[:locked]
+        puts "Vous n'avez pas le droit de faire ça."
+      else
+        puts elem.first[:content]
+      end
+    else
+      puts "Le fichier n'existe pas ou n'est pas un fichier."
+    end
+    self
   end
 
-  def chmod
-
+  def chmod args
+    if args.empty?
+      puts "Vos devez préciser un fichier."
+    elsif args.count < 2
+      puts "Vous devez préciser le mode et le fichier."
+    else
+      mode = args.first
+      file = args[1]
+      (puts "Le mode est incorrect, doit être: '+r'" ; return self) if mode != "+r"
+      elem = @list.select { |l| l[:slug] == file and l[:kind] == :file }
+      (puts "Le fichier n'a pas pu être trouvé" ; return self) if elem.empty?
+      elem.first[:locked] = false
+      puts "Les droits du fichier ont bien été modifié."
+    end
+    self
   end
 
-  def rm
+  def rm args
+    # TODO: Pas que dans cette classe
+    if args.empty?
+      puts "Vos devez préciser un fichier."
+    else
+      elem = @list.select { |l| l[:slug] == args.first.strip}
+      (puts "Le fichier n'a pas pu être trouvé" ; return self) if elem.empty?
+      (puts "Vous ne pouvez pas supprimer ce fichier." ; return self) if !elem.first[:removable]
+      @list.delete_if { |l| l[:slug] == args.first.strip }
+      puts "Le fichier a bien été supprimé."
+    end
+    self
+  end
 
+  def edit args
+    (puts "Vos devez préciser un fichier." ; return self) if args.empty?
+    elem = @list.select { |l| l[:slug] == args.first.strip}
+    (puts "Le fichier n'a pas pu être trouvé" ; return self) if elem.empty?
+    (puts "Vous n'avez pas le droit d'éditer ce fichier." ; return self) if elem.first[:locked]
+    new_pwd = $prompt.ask("$ Nouveau mot de passe pour #{@path}: ")
+    (puts "Le mot de passe n'a pas été sauvegardé" ; return self) if new_pwd.blank?
+    @list.select { |l| l[:slug] == '.passwd' }.first[:content] = new_pwd
+    @password = new_pwd
+    $admins.select { |u| u[:slug] == @slug}.first[:password] = @password
+    self
   end
 end
 
-$admins.each do |admin|
 
+# TODO: Faire heriter cette classe de fakedir aussi
+$admins.each do |admin|
   klass_name = admin[:slug].camelize
   klass = Class.new(User) do
     define_method :initialize do
@@ -77,6 +128,7 @@ $admins.each do |admin|
       @name = admin[:name]
       @slug = admin[:slug]
       @path = @name
+      @list = [ {name: "Passwd", slug: ".passwd", removable: false, locked: true, hidden: true, content: @password, kind: :file} ]
     end
   end
   Object.const_set(klass_name, klass)
@@ -87,7 +139,7 @@ end
 
 class FakeDir
   attr_reader :path
-  def ls
+  def ls args
     @list.each { |l| puts "#{l[:slug]}\t\t"}
   end
 
@@ -113,6 +165,7 @@ class AdminDir < FakeDir
   def initialize
     @list = Array.new
     @path = "admin"
+    @parent_dir = $home_dir
     # set
   end
 
@@ -236,6 +289,7 @@ class Shell
     # $current_dir = $home_dir
     # $current_dir = $security_dir
     @current_dir = $users_dir
+    @current_dir = FrancoisRoublon.new
   end
 
   def display
@@ -253,38 +307,21 @@ class Shell
     cmd_args = args.strip.split.drop(1)
     case cmd
     when 'ls'
-      @current_dir.ls
+      @current_dir.ls(cmd_args)
     when 'cd'
       @current_dir = @current_dir.cd(cmd_args)
+    when 'cat'
+      @current_dir = @current_dir.cat(cmd_args)
+    when 'chmod'
+      @current_dir = @current_dir.chmod(cmd_args)
+    when 'rm'
+      @current_dir = @current_dir.rm(cmd_args)
+    when 'edit'
+      @current_dir = @current_dir.edit(cmd_args)
     else
       puts "La commande a mal été formulée."
     end
   end
-
-  protected
-
-  # def set_admins
-  #   [
-  #     {name: 'Francois Roublon', slug: 'francois_roublon', password: 'zsexdr1'},
-  #     {name: 'Eric Delafre', slug: 'eric_delafre', password: 'xdrcft3'},
-  #     {name: 'Elodie Etourneau', slug: 'elodie_etourneau', password: 'cfttfc3'},
-  #     {name: 'Maeva Fares', slug: 'maeva_fares', password: 'vgyygv4'},
-  #     {name: 'Max Bourdi', slug: 'max_bourdi', password: 'eszxdr6'},
-  #     {name: 'Amhed Barakat', slug: 'amhed_barakat', password: 'okmbhu3'},
-  #     {name: 'Jean Soummier', slug: 'jean_soummier', password: 'njiuhg7'},
-  #     {name: 'Valerie Van der Meulen', slug: 'valerie_van_der_meulen', password: 'njiokl0'},
-  #     {name: 'Juliette Soisson', slug: 'juliette_soisson', password: 'xdresv7'},
-  #     {name: 'Lise Hautard', slug: 'lise_hautard', password: 'bhuijn5'},
-  #     {name: 'Yvan Champeroux', slug: 'yvan_champeroux', password: 'cvbnhu2'},
-  #     {name: 'Nicolas Peroteau', slug: 'nicolas_peroteau', password: 'njiuhbt'},
-  #     {name: 'Franny Kilab', slug: 'franny_kilab', password: 'fghjkl8'},
-  #     {name: 'Veronique Grangeon', slug: 'veronique_grangeon', password: 'cgydht6'},
-  #     {name: 'Corinne Stermann', slug: 'corinne_stermann', password: 'bnhjui9'},
-  #     {name: 'Denis Martin', slug: 'denis_martin', password: 'werfgt3'},
-  #     {name: 'Mathieu Manley', slug: 'mathieu_manley', password: 'qwertgh2'},
-  #     {name: 'Justine Juste', slug: 'justine_juste', password: 'qwdfgh7'}
-  #   ]
-  # end
 end
 
 # puts "toto".classify
