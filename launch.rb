@@ -2,13 +2,33 @@
 
 # TODO: CTRL + C
 # TODO: EN | FR
-
-require 'tty-prompt'
-require 'rubygems'
-require 'active_support/all'
 # TODO: only for camelize and constantize
 
+require 'tty-prompt'
+require 'tty-cursor'
+require 'tty-table'
+require 'rubygems'
+require 'active_support/all'
+require 'artii'
+require 'whirly'
+require 'paint'
+require "curses"
+require 'colorize'
+require 'time'
+require 'faker'
+
+Faker::Config.locale = 'fr'
+
+class String
+def bold;           "\e[1m#{self}\e[22m" end
+def italic;         "\e[3m#{self}\e[23m" end
+def underline;      "\e[4m#{self}\e[24m" end
+def blink;          "\e[5m#{self}\e[25m" end
+def reverse_color;  "\e[7m#{self}\e[27m" end
+end
+
 $prompt = TTY::Prompt.new(interrupt: false)
+
 
 $admins = [
   {name: 'Francois Roublon', slug: 'francois_roublon', password: 'zsexdr1'},
@@ -31,7 +51,13 @@ $admins = [
   {name: 'Justine Juste', slug: 'justine_juste', password: 'qwdfgh7'}
 ]
 
-class User
+
+require_relative 'hints_and_helps'
+require_relative 'fake_dir'
+require_relative 'personnes'
+require_relative 'tuto'
+
+class AdminUser
   attr_reader :password, :name, :slug, :path
 
   def initialize
@@ -121,7 +147,7 @@ end
 # TODO: Faire heriter cette classe de fakedir aussi
 $admins.each do |admin|
   klass_name = admin[:slug].camelize
-  klass = Class.new(User) do
+  klass = Class.new(AdminUser) do
     define_method :initialize do
       @parent_dir = $users_dir
       @password = admin[:password]
@@ -137,28 +163,7 @@ end
 
 # puts "francois_roublon".camelize.constantize.new.password
 
-class FakeDir
-  attr_reader :path
-  def ls args
-    @list.each { |l| puts "#{l[:slug]}\t\t"}
-  end
 
-  def cd_home
-
-  end
-
-  protected
-  def validate_path args
-    if args.empty?
-      puts "Specify dir..."
-      return false
-    elsif (args.first == ".." and self.path == "home")
-      puts "Cannot go furthur"
-      return false
-    end
-    true
-  end
-end
 
 class AdminDir < FakeDir
 
@@ -193,7 +198,7 @@ class PasswordDir < FakeDir
   end
 end
 
-class UsersDir < FakeDir
+class AdminUsersDir < FakeDir
   def initialize
     @path = "utilisateurs"
     @parent_dir = $security_dir
@@ -284,7 +289,7 @@ class Shell
     $admin_dir = AdminDir.new()
     $security_dir = SecurityDir.new
     $password_dir = PasswordDir.new()
-    $users_dir = UsersDir.new()
+    # $users_dir = UsersDir.new()
     # @path = @home_dir.path
     # $current_dir = $home_dir
     # $current_dir = $security_dir
@@ -327,5 +332,7 @@ end
 # puts "toto".classify
 # puts "toto_lol".camelize
 
+Tuto.new
+
 @shell = Shell.new
-@shell.display
+# @shell.display
