@@ -9,4 +9,5 @@ source 'https://rubygems.org' do
   gem 'tty-cursor'
   gem 'tty-table'
   gem 'faker'
+  gem 'i18n'
 end

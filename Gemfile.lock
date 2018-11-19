@@ -64,6 +64,7 @@ DEPENDENCIES
   colorize (~> 0.8.1)!
   curses (~> 1.2, >= 1.2.4)!
   faker!
+  i18n!
   paint!
   tty-cursor!
   tty-prompt!

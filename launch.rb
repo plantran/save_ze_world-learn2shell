@@ -17,8 +17,14 @@ require 'colorize'
 require 'time'
 require 'faker'
 require 'securerandom'
+# require "i18n"
+
+
 
 Faker::Config.locale = 'fr'
+$prompt = TTY::Prompt.new(interrupt: :noop)
+# I18n.config.available_locales = :en
+# I18n.config.available_locales = :fr
 
 class String
 def bold;           "\e[1m#{self}\e[22m" end
@@ -26,9 +32,22 @@ def italic;         "\e[3m#{self}\e[23m" end
 def underline;      "\e[4m#{self}\e[24m" end
 def blink;          "\e[5m#{self}\e[25m" end
 def reverse_color;  "\e[7m#{self}\e[27m" end
+  def epur
+    self.gsub(/\s+/, "")
+  end
 end
 
-$prompt = TTY::Prompt.new(interrupt: false)
+def display_prompt
+
+end
+
+def display_letters str, speed=nil
+  speed = speed || (1.0 / 30)
+  str.split("").each do |c|
+    print c
+    sleep(speed)
+  end
+end
 
 $admins = [
   {:name=>"Vrezeok", :slug=>"vrezeok", :password=>"90e51a2"},
@@ -59,7 +78,7 @@ rescue NameError
   return false
 end
 
-# require_relative 'fake_dir'
+# require_relative './fake_dirs/base'
 Dir["./fake_dirs/*.rb"].each {|file| require_relative file }
 
 require_relative 'populate'
@@ -70,7 +89,8 @@ populate_planets
 $analyses_dir = AnalysesDir.new
 $planetes_dir = PlanetesDir.new
 $security_dir = SecurityDir.new
-$admin_dir = AdminDir.new
+$admin_dir = AdminPwdDir.new
+$admin_part_dir = AdminPartDir.new
 
 $home_dir = HomeDir.new
 
@@ -175,131 +195,11 @@ class AdminUser
   end
 end
 
-
-# TODO: Faire heriter cette classe de fakedir aussi
-$admins.each do |admin|
-  klass_name = admin[:slug].camelize
-  klass = Class.new(AdminUser) do
-    define_method :initialize do
-      @parent_dir = $users_dir
-      @password = admin[:password]
-      @name = admin[:name]
-      @slug = admin[:slug]
-      @path = @name
-      @list = [ {name: "Passwd", slug: ".passwd", removable: false, locked: true, hidden: true, content: @password, kind: :file} ]
-    end
-  end
-  Object.const_set(klass_name, klass)
-end
-
-
-# puts "francois_roublon".camelize.constantize.new.password
-
-
-
-# class AdminDir < FakeDir
-#
-#   def initialize
-#     @list = Array.new
-#     @path = "admin"
-#     @parent_dir = $home_dir
-#     # set
-#   end
-#
-#   def cd args
-#     return self unless validate_path(args)
-#     return @parent_dir if (args.first == "..")
-#     slug = args.first
-#   end
-#
-#   protected
-#   def set
-#     $admins.each do |a|
-#       @list << a.merge({kind: :dir})
-#     end
-#   end
-# end
-
-class PasswordDir < FakeDir
-  def initialize
-  end
-end
-
-class AdminUsersDir < FakeDir
-  def initialize
-    @path = "utilisateurs"
-    @parent_dir = $security_dir
-    @list = Array.new()
-    set_dirs
-  end
-
-  def cd args
-    return self unless validate_path(args)
-    return @parent_dir if (args.first == "..")
-    slug = args.first
-    (puts "Le dossier n'a pas été trouvé." ; return(self)) unless $admins.any? {|a| a[:slug] == slug}
-    user = $admins.select { |u| u[:slug] == slug}.first
-    pwd = $prompt.ask("$ Quel est le mot de passe pour cet utilisateur ? ") do |q|
-      q.modify   :downcase
-    end
-    if pwd.strip == user[:password]
-      puts "OK"
-      return user[:slug].camelize.constantize.new
-    else
-      puts "Le mot de passe est erroné"
-    end
-    self
-  end
-
-  protected
-
-  def set_dirs
-    $admins.each do |a|
-      @list << a.merge({kind: :dir, removable: :false})
-    end
-  end
-end
-
-# class SecurityDir < FakeDir
-#   def initialize
-#     @list = [
-#       {name: 'Mots de passe', slug: 'mots_de_passe', removable: false, kind: :dir, target: $password_dir},
-#       {name: 'Utilisateurs', slug: 'utilisateurs', removable: false, kind: :dir, target: $users_dir},
-#     ]
-#     @path = "security"
-#     @parent_dir = $home_dir
-#   end
-#
-#   def cd args
-#     return self unless validate_path(args)
-#     return @parent_dir if (args.first == "..")
-#     case args.first
-#     when 'mots_de_passe'
-#       $admin_dir
-#     when 'utilisateurs'
-#       $users_dir
-#     else
-#       puts "Le dossier n'a pas été trouvé."
-#       self
-#     end
-#   end
-# end
-
-
 class Shell
   def initialize(path="home")
-    # $admins = set_admins
-    # $home_dir = HomeDir.new
-    # $admin_dir = AdminDir.new()
-    # $security_dir = SecurityDir.new
-    # $password_dir = PasswordDir.new()
-    # $users_dir = UsersDir.new()
-    # @path = @home_dir.path
     $current_dir = $home_dir
-    $current_dir = $security_dir
-    # $current_dir = $security_dir
-    # $current_dir = $users_dir
-    # $current_dir = FrancoisRoublon.new
+    # $current_dir = $admin_dir
+    # $current_dir = $admin_part_dir
   end
 
   def display
@@ -330,15 +230,33 @@ class Shell
       $current_dir.edit(cmd_args)
     when 'aide'
       system "less aide.less"
+    when 'status'
+      $current_dir.status
+    when 'admin'
+      access_admin
+    when 'destruction'
+      $current_dir.destroy_ship
     else
       puts "La commande a mal été formulée."
     end
   end
+
+  private
+
+  def access_admin
+    pwd = nil
+    while !pwd
+      pwd = $prompt.ask("Mot de passe pour accéder à la gestion du vaisseau :")
+      if pwd != $admin_part_dir.password
+        puts "Mauvais mot de passe"
+      else
+        $current_dir.cd(["admin_part"])
+      end
+    end
+  end
 end
 
-# puts "toto".classify
-# puts "toto_lol".camelize
 
-# Tuto.new
+Tuto.new
 @shell = Shell.new
 @shell.display

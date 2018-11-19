@@ -53,6 +53,7 @@ class FakeDir
     (puts "Tu dois préciser un dossier après la commande." ; return ) if args.empty?
     arg = args.first.strip
     (puts "Tu ne peux pas aller plus loin." ; return) if $current_dir.path == "home" && arg == ".."
+    ($current_dir = $admin_part_dir ; return) if arg == "admin_part"
     elem = @list.select { |l| l[:slug] == arg}.first
     ($current_dir = @parent_dir ; return) if arg == ".."
     if elem
@@ -101,6 +102,14 @@ class FakeDir
     else
       puts "Le fichier n'existe pas ou n'est pas un fichier."
     end
+  end
+
+  def status
+    puts "La commande a mal été formulée."
+  end
+
+  def destroy_ship
+    puts "La commande a mal été formulée."
   end
 
   def cd_home

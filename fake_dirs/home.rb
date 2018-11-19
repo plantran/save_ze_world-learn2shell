@@ -8,18 +8,6 @@ class HomeDir < FakeDir
       {name: 'Admin', slug: 'admin', removable: false, locked: false, kind: :dir, target: $admin_dir}
     ]
     @list.each { |l| l[:target].parent_dir = self if l[:target]}
+    $admin_part_dir.parent_dir = self
   end
-
-  # def cd args
-  #   return self unless validate_path(args)
-  #   case args.first
-  #   when 'security'
-  #     $security_dir
-  #   when 'admin'
-  #     $admin_dir
-  #   else
-  #     puts "Le dossier n'a pas été trouvé."
-  #     self
-  #   end
-  # end
 end
