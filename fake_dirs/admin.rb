@@ -88,12 +88,7 @@ class AdminPartDir < FakeDir
       str = "Il n'y a pas assez d'aérations ouvertes !\n".colorize(:red)
       display_letters(str)
       cursor.invisible {
-        0.upto(5) do
-          print "\r⚠️   "
-          sleep 0.4
-          print "\r     "
-          sleep 0.4
-        end
+        0.upto(5) { print "\r⚠️   " ; sleep 0.4 ; print "\r     " ; sleep 0.4 }
       }
       screen_clear
       a = Artii::Base.new(font: 'slant')

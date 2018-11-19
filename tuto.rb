@@ -41,41 +41,29 @@ class Tuto
       sleep 4
     end
     cursor.invisible {
-      0.upto(5) do
-        print "\r☠️   "
-        sleep 0.4
-        print "\r     "
-        sleep 0.4
-      end
+      0.upto(5) { print "\r☠️   " ; sleep 0.4 ; print "\r     " ; sleep 0.4 }
     }
     screen_clear
     sleep 0.5
     puts ascii_slant.asciify('ACCES INTERDIT !').colorize(:red)
     puts @hint.infiltrate_computer
     puts @help.edit
-    cmd = nil
-    while !cmd || cmd.strip != 'edit autorisations'
-      cmd = $prompt.ask("$> ") do |q|
-        q.modify   :downcase
-      end
-      puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'edit autorisations'
-    end
+
+    tuto_prompt("", "edit autorisations")
     user_name = add_self_name.first.split(' ').first
     new_user_class({ name: user_name, blood: "O+", code_cb: ((0...8).map { (65 + rand(26)) }.join), age: rand(11..16)})
-
     $current_user = "User#{user_name.camelize}".constantize.new
 
-    puts $current_user
-    puts $current_user.name
-
-
     puts @hint.rewrite_firstname($current_user.name)
+
     answer = nil
     while !answer || answer != $current_user.name
       answer = $prompt.ask("Prénom :") do |q|
         q.modify   :downcase
       end
+      exit if answer == "exit"
     end
+
     Whirly.start spinner: "random_dots" do
       sleep 4
     end
@@ -87,112 +75,59 @@ class Tuto
   end
 
   def second_part
-    # user_name = "paula"
-    # new_user_class({ name: user_name, blood: "O+", code_cb: ((0...8).map { (65 + rand(26)) }.join), age: rand(11..16)})
-    # $current_user = "User#{user_name.camelize}".constantize.new
-
     $users_dir = AnalysesDir.new()
     $users_dir.list << {name: $current_user.name, slug: $current_user.name.downcase, removable: false, locked: false, kind: :dir}
 
     puts @hint.after_authorized
     puts @help.after_authorized
 
-    cmd = nil
-    while !cmd || cmd.strip != 'ls'
-      cmd = $prompt.ask("$> ") do |q|
-        q.modify   :downcase
-      end
-      puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'ls'
-    end
+    tuto_prompt("", "ls")
     $users_dir.ls
     puts @hint.after_ls
     puts @help.after_ls
 
-    cmd = nil
-    puts $current_user.slug
-    while !cmd || cmd.strip != "cd #{$current_user.slug}"
-      cmd = $prompt.ask("$> ") do |q|
-        q.modify   :downcase
-      end
-      puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != "cd #{$current_user.slug}"
-    end
+
+    tuto_prompt("", "cd #{$current_user.slug}")
 
     puts @hint.after_cd
 
-    cmd = nil
-    while !cmd || cmd.strip != 'ls'
-      cmd = $prompt.ask("$ #{$current_user.name} > ") do |q|
-        q.modify   :downcase
-      end
-      puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'ls'
-    end
+    tuto_prompt($current_user.name, 'ls')
 
     $current_user.ls
 
     puts @hint.after_enter_user
     puts @help.after_enter_user
 
-    cmd = nil
-    while !cmd || cmd.strip != 'cat prochaine-analyse'
-      cmd = $prompt.ask("$ #{$current_user.name} > ") do |q|
-        q.modify   :downcase
-      end
-      puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'cat prochaine-analyse'
-    end
+    tuto_prompt($current_user.name, 'cat prochaine-analyse')
 
     $current_user.cat(["prochaine-analyse"])
 
     puts @hint.after_cat
     puts @help.after_cat
 
-    cmd = nil
-    while !cmd || cmd.strip != 'rm prochaine-analyse'
-      cmd = $prompt.ask("$ #{$current_user.name} > ") do |q|
-        q.modify   :downcase
-      end
-      puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'rm prochaine-analyse'
-    end
+    tuto_prompt($current_user.name, 'rm prochaine-analyse')
 
     $current_user.rm(["prochaine-analyse"])
 
 
     puts @hint.after_rm
 
-    cmd = nil
-    while !cmd || cmd.strip != 'cat derniere-analyse'
-      cmd = $prompt.ask("$ #{$current_user.name} > ") do |q|
-        q.modify   :downcase
-      end
-      puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'cat derniere-analyse'
-    end
+    tuto_prompt($current_user.name, 'cat derniere-analyse')
 
     $current_user.cat(["derniere-analyse"])
 
     puts @hint.after_cat_user
 
-    cmd = nil
-    while !cmd || cmd.strip != 'rm derniere-analyse'
-      cmd = $prompt.ask("$ #{$current_user.name} > ") do |q|
-        q.modify   :downcase
-      end
-      puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'rm derniere-analyse'
-    end
+    tuto_prompt($current_user.name, 'rm derniere-analyse')
 
     $current_user.rm(["derniere-analyse"])
 
     puts @hint.after_failed_rm
     puts @help.edit("derniere-analyse")
 
-    cmd = nil
-    while !cmd || cmd.strip != 'edit derniere-analyse'
-      cmd = $prompt.ask("$ #{$current_user.name} > ") do |q|
-        q.modify   :downcase
-      end
-      puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'edit derniere-analyse'
-    end
+    tuto_prompt($current_user.name, 'edit derniere-analyse')
     $current_dir = $current_user
     $current_user.edit(["derniere-analyse"])
-
     system "less ada_lovelace.less"
 
   end
@@ -202,7 +137,6 @@ class Tuto
     puts @hint.after_edit_analyse
     puts @help.after_edit_analyse
     $prompt.ask("Appuie sur entrée pour continuer...")
-    # $current_dir = $home_dir
   end
 
   private
@@ -224,4 +158,15 @@ class Tuto
     return diff
   end
 
+  def tuto_prompt path, answer
+    cmd = nil
+    while !cmd || cmd.strip != answer
+      cmd = $prompt.ask("$ #{path} >") do |q|
+        q.modify   :downcase
+      end
+      exit if cmd == "exit"
+      puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != answer
+    end
+
+  end
 end
