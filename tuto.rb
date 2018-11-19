@@ -9,49 +9,6 @@ def nano filename
   system "nano -t #{filename}"
 end
 
-def ascii_computer
-  puts "            ____________________________________________________  					"
-  puts "           /                                                    \\						"
-  puts "          |    _____________________________________________     |                   	"
-  puts "          |   |                                             |    | 					"
-  puts "          |   |  C:\\\> _ " + "ACCES REFUSÉ".bold.red + "                        |    |                   	"
-  puts "          |   |                                             |    |                   	"
-  puts "          |   |                                             |    |                   	"
-  puts "          |   |                                             |    |                   	"
-  puts "          |   |                                             |    |                   	"
-  puts "          |   |                                             |    |                   	"
-  puts "          |   |                                             |    |                   	"
-  puts "          |   |                                             |    |                   	"
-  puts "          |   |                                             |    |                   	"
-  puts "          |   |                                             |    |                   	"
-  puts "          |   |                                             |    |                   	"
-  puts "          |   |                                             |    |                   	"
-  puts "          |   |_____________________________________________|    |                   	"
-  puts "          |                                                      |                   	"
-  puts "           \\_____________________________________________________/                   	"
-  puts "                  \\\_______________________________________/                   		"
-  puts "               _______________________________________________                   		"
-  puts "            _-'    .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.  --- `-_                   	"
-  puts "         _-'.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.--.  .-.-.`-_                   "
-  puts "      _-'.-.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-`__`. .-.-.-.`-_                   	"
-  puts "   _-'.-.-.-.-. .-----.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-----. .-.-.-.-.`-_                   	"
-  puts "_-'.-.-.-.-.-. .---.-. .-----------------------------. .-.---. .---.-.-.-.`-_                   	"
-  puts ":-----------------------------------------------------------------------------:                   	"
-  puts "`---._.-----------------------------------------------------------------._.---'                   	"
-end
-
-def ascii_spaceship
-  "       ___
-   ___/   \\___
-  /   '---'   \\
-  '--_______--'
-       / \\
-      /   \\
-      /\\O/\\
-      / | \\
-      // \\\\ "
-end
-
 def display_letters str, speed=nil
   speed = speed || (1.0 / 30)
   str.split("").each do |c|
@@ -67,9 +24,10 @@ class Tuto
     @help = HelpCommands.new
     @auth_logins = ["Vrezeok", "Krerrin", "Vrils", "Iktoks", "Daldrar", "Choldal", "Ghid", "Teivil", "Ruldeth", "Coknals", "Tenqids", "Korkeids", "Arkrils", "Ulmae", "Uval", "Yudda", "Khoknuts", "Gulxot", "Fodreas"]
     File.open("autorisations", "w+") {|f| f.puts @auth_logins.map {|l| l} }
-    # screen_clear
+    screen_clear
     # first_part
     second_part
+    last_part
   end
 
   def first_part
@@ -134,119 +92,121 @@ class Tuto
   def second_part
     user_name = "paula"
     new_user_class({ name: user_name, blood: "O+", code_cb: ((0...8).map { (65 + rand(26)) }.join), age: rand(11..16)})
-
     $current_user = "User#{user_name.camelize}".constantize.new
-    $users_dir = UsersDir.new()
+
+    $users_dir = AnalysesDir.new()
     $users_dir.list << {name: $current_user.name, slug: $current_user.name.downcase, removable: false, locked: false, kind: :dir}
-
-    puts @hint.after_authorized
-    puts @help.after_authorized
-
-    cmd = nil
-    while !cmd || cmd.strip != 'ls'
-      cmd = $prompt.ask("$> ") do |q|
-        q.modify   :downcase
-      end
-      puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'ls'
-    end
-    $users_dir.ls
-    puts @hint.after_ls
-    puts @help.after_ls
-
-    cmd = nil
-    while !cmd || cmd.strip != "cd #{$current_user.slug}"
-      cmd = $prompt.ask("$> ") do |q|
-        q.modify   :downcase
-      end
-      puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != "cd #{$current_user.slug}"
-    end
-
-    puts @hint.after_cd
-
-    cmd = nil
-    while !cmd || cmd.strip != 'ls'
-      cmd = $prompt.ask("$ #{$current_user.name} > ") do |q|
-        q.modify   :downcase
-      end
-      puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'ls'
-    end
-
-    $current_user.ls
-
-    puts @hint.after_enter_user
-    puts @help.after_enter_user
-
-    cmd = nil
-    while !cmd || cmd.strip != 'cat prochaine-analyse'
-      cmd = $prompt.ask("$ #{$current_user.name} > ") do |q|
-        q.modify   :downcase
-      end
-      puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'cat prochaine-analyse'
-    end
-
-    $current_user.cat(["prochaine-analyse"])
-
-    puts @hint.after_cat
-    puts @help.after_cat
-
-    cmd = nil
-    while !cmd || cmd.strip != 'rm prochaine-analyse'
-      cmd = $prompt.ask("$ #{$current_user.name} > ") do |q|
-        q.modify   :downcase
-      end
-      puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'rm prochaine-analyse'
-    end
-
-    $current_user.rm(["prochaine-analyse"])
-
-
-    puts @hint.after_rm
-
-    cmd = nil
-    while !cmd || cmd.strip != 'cat derniere-analyse'
-      cmd = $prompt.ask("$ #{$current_user.name} > ") do |q|
-        q.modify   :downcase
-      end
-      puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'cat derniere-analyse'
-    end
-
-    $current_user.cat(["derniere-analyse"])
-
-    puts @hint.after_cat_user
-
-    cmd = nil
-    while !cmd || cmd.strip != 'rm derniere-analyse'
-      cmd = $prompt.ask("$ #{$current_user.name} > ") do |q|
-        q.modify   :downcase
-      end
-      puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'rm derniere-analyse'
-    end
-
-    $current_user.rm(["derniere-analyse"])
-
-    puts @hint.after_failed_rm
-    puts @help.edit("derniere-analyse")
-
-    cmd = nil
-    while !cmd || cmd.strip != 'edit derniere-analyse'
-      cmd = $prompt.ask("$ #{$current_user.name} > ") do |q|
-        q.modify   :downcase
-      end
-      puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'edit derniere-analyse'
-    end
-    $current_dir = $current_user
-    $current_user.edit(["derniere-analyse"])
-
-    screen_clear
-
-    puts @hint.after_edit_analyse
-
-    $prompt.ask("Appuie sur entrée pour continuer...")
-
-    system "less ada_lovelace.less"
+    #
+    # puts @hint.after_authorized
+    # puts @help.after_authorized
+    #
+    # cmd = nil
+    # while !cmd || cmd.strip != 'ls'
+    #   cmd = $prompt.ask("$> ") do |q|
+    #     q.modify   :downcase
+    #   end
+    #   puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'ls'
+    # end
+    # $users_dir.ls
+    # puts @hint.after_ls
+    # puts @help.after_ls
+    #
+    # cmd = nil
+    # while !cmd || cmd.strip != "cd #{$current_user.slug}"
+    #   cmd = $prompt.ask("$> ") do |q|
+    #     q.modify   :downcase
+    #   end
+    #   puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != "cd #{$current_user.slug}"
+    # end
+    #
+    # puts @hint.after_cd
+    #
+    # cmd = nil
+    # while !cmd || cmd.strip != 'ls'
+    #   cmd = $prompt.ask("$ #{$current_user.name} > ") do |q|
+    #     q.modify   :downcase
+    #   end
+    #   puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'ls'
+    # end
+    #
+    # $current_user.ls
+    #
+    # puts @hint.after_enter_user
+    # puts @help.after_enter_user
+    #
+    # cmd = nil
+    # while !cmd || cmd.strip != 'cat prochaine-analyse'
+    #   cmd = $prompt.ask("$ #{$current_user.name} > ") do |q|
+    #     q.modify   :downcase
+    #   end
+    #   puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'cat prochaine-analyse'
+    # end
+    #
+    # $current_user.cat(["prochaine-analyse"])
+    #
+    # puts @hint.after_cat
+    # puts @help.after_cat
+    #
+    # cmd = nil
+    # while !cmd || cmd.strip != 'rm prochaine-analyse'
+    #   cmd = $prompt.ask("$ #{$current_user.name} > ") do |q|
+    #     q.modify   :downcase
+    #   end
+    #   puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'rm prochaine-analyse'
+    # end
+    #
+    # $current_user.rm(["prochaine-analyse"])
+    #
+    #
+    # puts @hint.after_rm
+    #
+    # cmd = nil
+    # while !cmd || cmd.strip != 'cat derniere-analyse'
+    #   cmd = $prompt.ask("$ #{$current_user.name} > ") do |q|
+    #     q.modify   :downcase
+    #   end
+    #   puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'cat derniere-analyse'
+    # end
+    #
+    # $current_user.cat(["derniere-analyse"])
+    #
+    # puts @hint.after_cat_user
+    #
+    # cmd = nil
+    # while !cmd || cmd.strip != 'rm derniere-analyse'
+    #   cmd = $prompt.ask("$ #{$current_user.name} > ") do |q|
+    #     q.modify   :downcase
+    #   end
+    #   puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'rm derniere-analyse'
+    # end
+    #
+    # $current_user.rm(["derniere-analyse"])
+    #
+    # puts @hint.after_failed_rm
+    # puts @help.edit("derniere-analyse")
+    #
+    # cmd = nil
+    # while !cmd || cmd.strip != 'edit derniere-analyse'
+    #   cmd = $prompt.ask("$ #{$current_user.name} > ") do |q|
+    #     q.modify   :downcase
+    #   end
+    #   puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != 'edit derniere-analyse'
+    # end
+    # $current_dir = $current_user
+    # $current_user.edit(["derniere-analyse"])
+    #
+    # system "less ada_lovelace.less"
 
   end
 
+  def last_part
+    screen_clear
+    puts @hint.after_edit_analyse
+    puts @help.after_edit_analyse
+    $prompt.ask("Appuie sur entrée pour continuer...")
+    $current_dir = $home_dir
+    puts $current_dir.path
+  end
 
   private
 

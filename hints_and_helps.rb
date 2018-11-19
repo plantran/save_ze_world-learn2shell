@@ -69,11 +69,11 @@ class Hint
 
   def after_edit_analyse
     h = "\n\n"
-    h += "💡  Super, tu es maintenant intraçable sur le système informatique alien !\n"
-    h += "    Maintenant, tu vas pouvoir commencer à détruire le vaisseau à distance..."
+    h += "💡  Super, tu es maintenant intraçable sur le système informatique alien"
+    h += " et libre de te déplacer où tu veux.\n Tu vas pouvoir commencer à détruire le vaisseau à distance...\n"
+    h += "    Pour voir ce que tu peux faire, tape la commande " + "aide".italic + ". "
     h += "\n-----------\n\n"
   end
-
 end
 
 class HelpCommands
@@ -120,6 +120,15 @@ class HelpCommands
     h += "   Pour supprimer un fichier, tape la commande " + "rm".italic + " suivi du nom du fichier.\n"
     h += "   Par exemple :\n"
     h += "   rm fichier".italic
+    h += "\n\n\n"
+  end
+
+  def after_edit_analyse
+    h = "💻  Commandes :\n"
+    h += "   La commande #{'aide'.italic} te permet de lister toutes les commandes que tu peux utiliser\n"
+    h += "   et de t'expliquer tout ce que tu peux faire.\n"
+    h += "   Rappelle-toi des commandes que tu as déjà vu : ls, cat, edit, rm, cd\n"
+    h += "   Quand tu rentres dans un nouveau dossier, n'hésite pas à taper #{'ls'.italic} pour voir tout ce qu'il contient !"
     h += "\n\n\n"
   end
 end

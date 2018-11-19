@@ -16,6 +16,7 @@ require "curses"
 require 'colorize'
 require 'time'
 require 'faker'
+require 'securerandom'
 
 Faker::Config.locale = 'fr'
 
@@ -29,33 +30,64 @@ end
 
 $prompt = TTY::Prompt.new(interrupt: false)
 
-
 $admins = [
-  {name: 'Francois Roublon', slug: 'francois_roublon', password: 'zsexdr1'},
-  {name: 'Eric Delafre', slug: 'eric_delafre', password: 'xdrcft3'},
-  {name: 'Elodie Etourneau', slug: 'elodie_etourneau', password: 'cfttfc3'},
-  {name: 'Maeva Fares', slug: 'maeva_fares', password: 'vgyygv4'},
-  {name: 'Max Bourdi', slug: 'max_bourdi', password: 'eszxdr6'},
-  {name: 'Amhed Barakat', slug: 'amhed_barakat', password: 'okmbhu3'},
-  {name: 'Jean Soummier', slug: 'jean_soummier', password: 'njiuhg7'},
-  {name: 'Valerie Van der Meulen', slug: 'valerie_van_der_meulen', password: 'njiokl0'},
-  {name: 'Juliette Soisson', slug: 'juliette_soisson', password: 'xdresv7'},
-  {name: 'Lise Hautard', slug: 'lise_hautard', password: 'bhuijn5'},
-  {name: 'Yvan Champeroux', slug: 'yvan_champeroux', password: 'cvbnhu2'},
-  {name: 'Nicolas Peroteau', slug: 'nicolas_peroteau', password: 'njiuhbt'},
-  {name: 'Franny Kilab', slug: 'franny_kilab', password: 'fghjkl8'},
-  {name: 'Veronique Grangeon', slug: 'veronique_grangeon', password: 'cgydht6'},
-  {name: 'Corinne Stermann', slug: 'corinne_stermann', password: 'bnhjui9'},
-  {name: 'Denis Martin', slug: 'denis_martin', password: 'werfgt3'},
-  {name: 'Mathieu Manley', slug: 'mathieu_manley', password: 'qwertgh2'},
-  {name: 'Justine Juste', slug: 'justine_juste', password: 'qwdfgh7'}
+  {:name=>"Vrezeok", :slug=>"vrezeok", :password=>"90e51a2"},
+  {:name=>"Krerrin", :slug=>"krerrin", :password=>"ff46339"},
+  {:name=>"Vrils", :slug=>"vrils", :password=>"79e1fdc"},
+  {:name=>"Iktoks", :slug=>"iktoks", :password=>"1fb301d"},
+  {:name=>"Daldrar", :slug=>"daldrar", :password=>"597c2ff"},
+  {:name=>"Choldal", :slug=>"choldal", :password=>"d2ee10e"},
+  {:name=>"Ghid", :slug=>"ghid", :password=>"b84142a"},
+  {:name=>"Teivil", :slug=>"teivil", :password=>"23fdbd6"},
+  {:name=>"Ruldeth", :slug=>"ruldeth", :password=>"12fb8d3"},
+  {:name=>"Coknals", :slug=>"coknals", :password=>"c28a979"},
+  {:name=>"Tenqids", :slug=>"tenqids", :password=>"803d086"},
+  {:name=>"Korkeids", :slug=>"korkeids", :password=>"f869410"},
+  {:name=>"Arkrils", :slug=>"arkrils", :password=>"3833b6a"},
+  {:name=>"Ulmae", :slug=>"ulmae", :password=>"55c869c"},
+  {:name=>"Uval", :slug=>"uval", :password=>"d9955a1"},
+  {:name=>"Yudda", :slug=>"yudda", :password=>"f52cabe"},
+  {:name=>"Khoknuts", :slug=>"khoknuts", :password=>"9896128"},
+  {:name=>"Gulxot", :slug=>"gulxot", :password=>"c27d749"},
+  {:name=>"Fodreas", :slug=>"fodreas", :password=>"17e128d"}
 ]
+
+def class_exists?(class_name)
+  klass = Module.const_get(class_name)
+  return klass.is_a?(Class)
+rescue NameError
+  return false
+end
+
+# require_relative 'fake_dir'
+Dir["./fake_dirs/*.rb"].each {|file| require_relative file }
+
+require_relative 'populate'
+
+populate_users
+populate_planets
+
+$analyses_dir = AnalysesDir.new
+$planetes_dir = PlanetesDir.new
+$security_dir = SecurityDir.new
+$admin_dir = AdminDir.new
+
+$home_dir = HomeDir.new
+
+
+
+# $admin_dir = AdminDir.new()
+# $security_dir = SecurityDir.new
+# $password_dir = PasswordDir.new()
 
 
 require_relative 'hints_and_helps'
-require_relative 'fake_dir'
+require_relative 'ascii_arts'
+
 require_relative 'personnes'
 require_relative 'tuto'
+
+
 
 class AdminUser
   attr_reader :password, :name, :slug, :path
@@ -165,33 +197,28 @@ end
 
 
 
-class AdminDir < FakeDir
-
-  def initialize
-    @list = Array.new
-    @path = "admin"
-    @parent_dir = $home_dir
-    # set
-  end
-
-  def cd args
-    return self unless validate_path(args)
-    return @parent_dir if (args.first == "..")
-    slug = args.first
-    # TODO: Creer
-    # case slug
-    # when ''
-    #
-    # end
-  end
-
-  protected
-  def set
-    $admins.each do |a|
-      @list << a.merge({kind: :dir})
-    end
-  end
-end
+# class AdminDir < FakeDir
+#
+#   def initialize
+#     @list = Array.new
+#     @path = "admin"
+#     @parent_dir = $home_dir
+#     # set
+#   end
+#
+#   def cd args
+#     return self unless validate_path(args)
+#     return @parent_dir if (args.first == "..")
+#     slug = args.first
+#   end
+#
+#   protected
+#   def set
+#     $admins.each do |a|
+#       @list << a.merge({kind: :dir})
+#     end
+#   end
+# end
 
 class PasswordDir < FakeDir
   def initialize
@@ -233,74 +260,52 @@ class AdminUsersDir < FakeDir
   end
 end
 
-class HomeDir < FakeDir
-  def initialize
-    @path = "home"
-    @list = [
-      {name: 'Security', slug: 'security', removable: false, kind: :dir, target: $security_dir},
-      {name: 'Admin', slug: 'admin', removable: false, kind: :dir, target: $admin_dir}
-    ]
-  end
-
-  def cd args
-    return self unless validate_path(args)
-    case args.first
-    when 'security'
-      $security_dir
-    when 'admin'
-      $admin_dir
-    else
-      puts "Le dossier n'a pas été trouvé."
-      self
-    end
-  end
-end
-
-class SecurityDir < FakeDir
-  def initialize
-    @list = [
-      {name: 'Mots de passe', slug: 'mots_de_passe', removable: false, kind: :dir, target: $password_dir},
-      {name: 'Utilisateurs', slug: 'utilisateurs', removable: false, kind: :dir, target: $users_dir},
-    ]
-    @path = "security"
-    @parent_dir = $home_dir
-  end
-
-  def cd args
-    return self unless validate_path(args)
-    return @parent_dir if (args.first == "..")
-    case args.first
-    when 'mots_de_passe'
-      $admin_dir
-    when 'utilisateurs'
-      $users_dir
-    else
-      puts "Le dossier n'a pas été trouvé."
-      self
-    end
-  end
-end
+# class SecurityDir < FakeDir
+#   def initialize
+#     @list = [
+#       {name: 'Mots de passe', slug: 'mots_de_passe', removable: false, kind: :dir, target: $password_dir},
+#       {name: 'Utilisateurs', slug: 'utilisateurs', removable: false, kind: :dir, target: $users_dir},
+#     ]
+#     @path = "security"
+#     @parent_dir = $home_dir
+#   end
+#
+#   def cd args
+#     return self unless validate_path(args)
+#     return @parent_dir if (args.first == "..")
+#     case args.first
+#     when 'mots_de_passe'
+#       $admin_dir
+#     when 'utilisateurs'
+#       $users_dir
+#     else
+#       puts "Le dossier n'a pas été trouvé."
+#       self
+#     end
+#   end
+# end
 
 
 class Shell
   def initialize(path="home")
     # $admins = set_admins
-    $home_dir = HomeDir.new
-    $admin_dir = AdminDir.new()
-    $security_dir = SecurityDir.new
-    $password_dir = PasswordDir.new()
+    # $home_dir = HomeDir.new
+    # $admin_dir = AdminDir.new()
+    # $security_dir = SecurityDir.new
+    # $password_dir = PasswordDir.new()
     # $users_dir = UsersDir.new()
     # @path = @home_dir.path
-    # $current_dir = $home_dir
+    $current_dir = $home_dir
+    $current_dir = $security_dir
     # $current_dir = $security_dir
-    @current_dir = $users_dir
-    @current_dir = FrancoisRoublon.new
+    # $current_dir = $users_dir
+    # $current_dir = FrancoisRoublon.new
   end
 
   def display
     args = nil
     while !args || args.strip != "exit"
-      args = $prompt.ask("$ #{@current_dir.path} >") do |q|
+      args = $prompt.ask("$ #{$current_dir.path} >") do |q|
         q.modify   :downcase
       end
       command_parse(args) if args
@@ -312,17 +317,19 @@ class Shell
     cmd_args = args.strip.split.drop(1)
     case cmd
     when 'ls'
-      @current_dir.ls(cmd_args)
+      $current_dir.ls(cmd_args)
     when 'cd'
-      @current_dir = @current_dir.cd(cmd_args)
+      $current_dir.cd(cmd_args)
     when 'cat'
-      @current_dir = @current_dir.cat(cmd_args)
+      $current_dir.cat(cmd_args)
     when 'chmod'
-      @current_dir = @current_dir.chmod(cmd_args)
+      $current_dir.chmod(cmd_args)
     when 'rm'
-      @current_dir = @current_dir.rm(cmd_args)
+      $current_dir.rm(cmd_args)
     when 'edit'
-      @current_dir = @current_dir.edit(cmd_args)
+      $current_dir.edit(cmd_args)
+    when 'aide'
+      system "less aide.less"
     else
       puts "La commande a mal été formulée."
     end
@@ -332,7 +339,6 @@ end
 # puts "toto".classify
 # puts "toto_lol".camelize
 
-Tuto.new
-
+# Tuto.new
 @shell = Shell.new
-# @shell.display
+@shell.display
