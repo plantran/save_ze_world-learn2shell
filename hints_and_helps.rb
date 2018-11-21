@@ -37,20 +37,22 @@ class Hint
 
   def after_enter_user
     h = "\n\n"
-    h += "💡  Tu peux voir que ce qu'il y a à l'interieur de ce dossier sont des fichiers, car il n'y a pas l'icône 🗂  devant.\n"
+    h += "💡  Tu peux voir que ce qu'il y a à l'interieur de ce dossier sont des fichiers, car il y a l'icône 📄  devant.\n"
     h += "    Voyons ce que contient le fichier " + "prochaine-analyse".italic + " !"
     h += "\n-----------\n\n"
   end
 
   def after_cat
     h = "\n\n"
-    h += "💡  Mmmh... Une analyse ?? Ca n'a pas l'air très très bon pour toi... Mieux vaut annuler ça tout de suite et supprimer ce fichier !"
+    h += "💡  Regarde juste en haut, c'est le contenu du fichier `prochaine-analyse`\n"
+    h += "   Tu peux remarquer que le système du vaisseau prévoit une analyse pour toi... Ca n'a pas l'air très très bon... Mieux vaut annuler ça tout de suite et supprimer ce fichier !"
     h += "\n-----------\n\n"
   end
 
   def after_rm
     h = "\n\n"
-    h += "💡  Super, maintenant que ce fichier a bien été supprimé, intéressons-nous au deuxième( derniere-analyse ). Affiche le contenu de ce fichier avec la commande " + "cat".italic
+    h += "💡  Super, maintenant que ce fichier a bien été supprimé, intéressons-nous au deuxième ( derniere-analyse ). Affiche le contenu de ce fichier avec la commande " + "cat\n".italic
+    h += "    Si tu ne sais plus ce qu'il y a dans le dossier où tu es, rappelle-toi que tu peux toujours faire la commande " + "ls".italic
     h += "\n-----------\n\n"
   end
 
@@ -83,7 +85,7 @@ class HelpCommands
     h = "💻  Commandes :\n"
     h += "   Pour éditer un fichier, tape la commande " + "edit".italic + " et le nom du fichier\n"
     h += "   que tu veux éditer derrière. Par exemple :\n"
-    h += "   edit #{file}".italic
+    h += "   edit #{file}".colorize(:light_yellow).italic
     h += "\n\n\n"
   end
 
@@ -91,15 +93,15 @@ class HelpCommands
     h = "💻  Commandes :\n"
     h += "   Pour voir ce qu'il y a dans le dossier où tu es, tu peux taper la commande " + "ls".italic + "\n"
     h += "   Par exemple :\n"
-    h += "   ls".italic
+    h += "   ls".colorize(:light_yellow).italic
     h += "\n\n\n"
   end
 
   def after_ls
     h = "💻  Commandes :\n"
-    h += "   Pour aller dans un dossier, il faut utiliser la commande " + "cd".italic + " avec son nom juste après.\n"
+    h += "   Pour aller dans un dossier, il faut utiliser la commande " + "cd".italic + " avec le nom du dossier juste après.\n"
     h += "   Par exemple :\n"
-    h += "   cd mon_dossier".italic
+    h += "   cd #{$current_user.slug}".colorize(:light_yellow).italic
     h += "\n\n\n"
   end
 
@@ -107,19 +109,21 @@ class HelpCommands
 
   end
 
-  def after_enter_user
+  def after_enter_user file=nil
+    file = file || "fichier"
     h = "💻  Commandes :\n"
     h += "   Pour afficher le contenu d'un fichier à l'écran, tape la commande " + "cat".italic + " suivi du nom du fichier.\n"
     h += "   Par exemple :\n"
-    h += "   cat fichier".italic
+    h += "   cat #{file}".colorize(:light_yellow).italic
     h += "\n\n\n"
   end
 
-  def after_cat
+  def after_cat file=nil
+    file = file || "fichier"
     h = "💻  Commandes :\n"
     h += "   Pour supprimer un fichier, tape la commande " + "rm".italic + " suivi du nom du fichier.\n"
     h += "   Par exemple :\n"
-    h += "   rm fichier".italic
+    h += "   rm #{file}".colorize(:light_yellow).italic
     h += "\n\n\n"
   end
 

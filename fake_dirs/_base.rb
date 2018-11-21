@@ -1,9 +1,8 @@
-# TODO: Le mettre meilleur endroit
 def display_dir kind, elem
   if kind == :dir
     "🗂   #{elem.bold}"
   else
-    "  #{elem}"
+    "📄   #{elem}"
   end
 end
 
@@ -14,7 +13,7 @@ class FakeDir
   def ls args=[]
     puts ""
     if !args.empty? && args.first.strip == "-a"
-      @list.sort_by { |l| l[:slug] }.each { |l| puts "#{l[:slug]}"}
+      @list.sort_by { |l| l[:slug] }.each { |l| puts display_dir(l[:kind], l[:slug])}
     else
       @list.sort_by { |l| l[:slug] }.each { |l| puts display_dir(l[:kind], l[:slug]) unless l[:hidden] == true}
     end
@@ -56,7 +55,7 @@ class FakeDir
     ($current_dir = $admin_part_dir ; return) if arg == "admin_part"
     elem = @list.select { |l| l[:slug] == arg}.first
     ($current_dir = @parent_dir ; return) if arg == ".."
-    if elem
+    if elem and elem[:kind] == :dir
       if elem[:pwd_needed]
         pwd = $prompt.ask("Mots de passe pour #{elem[:target].name} :") do |q|
           q.modify   :downcase

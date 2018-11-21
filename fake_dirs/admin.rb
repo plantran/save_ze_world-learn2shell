@@ -36,6 +36,7 @@ class AdminPartDir < FakeDir
       f = File.read(filename)
       if filename == "statut_composants"
         f.each_line do |l|
+          next if l.blank?
           var = l.split('=').first.strip.parameterize.underscore
           value = l.split('=').last.strip
           if var == "temperature_des_reacteurs" || var == "aerations_ouvertes"

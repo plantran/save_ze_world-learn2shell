@@ -1,4 +1,3 @@
-# TODO: Faire tuto : qu'est ce que le prompt au début
 include Curses
 
 def screen_clear
@@ -50,14 +49,18 @@ class Tuto
     puts @help.edit
 
     tuto_prompt("", "edit autorisations")
+
     user_name = add_self_name.first.split(' ').first
     new_user_class({ name: user_name, blood: "O+", code_cb: ((0...8).map { (65 + rand(26)) }.join), age: rand(11..16)})
     $current_user = "User#{user_name.camelize}".constantize.new
 
+    screen_clear
+    sleep 0.5
+    puts ascii_slant.asciify('ACCES INTERDIT !').colorize(:red)
     puts @hint.rewrite_firstname($current_user.name)
 
     answer = nil
-    while !answer || answer != $current_user.name
+    while !answer || answer != $current_user.name.downcase
       answer = $prompt.ask("Prénom :") do |q|
         q.modify   :downcase
       end
@@ -70,19 +73,20 @@ class Tuto
     screen_clear
     sleep 0.5
 
-    system "less alan_turing.less"
+    # system "less alan_turing.less"
     puts ascii_slant.asciify('ACCES AUTORISE !').colorize(:green)
   end
 
   def second_part
-    $users_dir = AnalysesDir.new()
-    $users_dir.list << {name: $current_user.name, slug: $current_user.name.downcase, removable: false, locked: false, kind: :dir}
+
+    $analyses_dir.list << {name: $current_user.name, slug: $current_user.name.downcase, removable: false, locked: false, kind: :dir, target: $current_user} unless $analyses_dir.list.any? {|h| h[:slug] == $current_user.name.downcase}
+    $current_dir = $current_user
 
     puts @hint.after_authorized
     puts @help.after_authorized
 
     tuto_prompt("", "ls")
-    $users_dir.ls
+    $analyses_dir.ls
     puts @hint.after_ls
     puts @help.after_ls
 
@@ -96,14 +100,14 @@ class Tuto
     $current_user.ls
 
     puts @hint.after_enter_user
-    puts @help.after_enter_user
+    puts @help.after_enter_user("prochaine-analyse")
 
     tuto_prompt($current_user.name, 'cat prochaine-analyse')
 
     $current_user.cat(["prochaine-analyse"])
 
     puts @hint.after_cat
-    puts @help.after_cat
+    puts @help.after_cat("prochaine-analyse")
 
     tuto_prompt($current_user.name, 'rm prochaine-analyse')
 
@@ -111,24 +115,25 @@ class Tuto
 
 
     puts @hint.after_rm
+    puts @help.after_enter_user('derniere-analyse')
 
-    tuto_prompt($current_user.name, 'cat derniere-analyse')
+    tuto_prompt($current_user.name, 'cat derniere-analyse', true)
 
     $current_user.cat(["derniere-analyse"])
 
     puts @hint.after_cat_user
+    puts @help.after_cat("derniere-analyse")
 
-    tuto_prompt($current_user.name, 'rm derniere-analyse')
+    tuto_prompt($current_user.name, 'rm derniere-analyse', true)
 
     $current_user.rm(["derniere-analyse"])
 
     puts @hint.after_failed_rm
     puts @help.edit("derniere-analyse")
 
-    tuto_prompt($current_user.name, 'edit derniere-analyse')
-    $current_dir = $current_user
+    tuto_prompt($current_user.name, 'edit derniere-analyse', true)
     $current_user.edit(["derniere-analyse"])
-    system "less ada_lovelace.less"
+    # system "less ada_lovelace.less"
 
   end
 
@@ -158,14 +163,23 @@ class Tuto
     return diff
   end
 
-  def tuto_prompt path, answer
+  def tuto_prompt path, answer, allow_ls = false
     cmd = nil
+    i = 0
     while !cmd || cmd.strip != answer
+      hint = ""
       cmd = $prompt.ask("$ #{path} >") do |q|
         q.modify   :downcase
+        q.modify   :strip
       end
-      exit if cmd == "exit"
-      puts "Ce n'est pas la bonne commande." if !cmd || cmd.strip != answer
+      if cmd == "ls" && allow_ls == true
+        $current_dir.ls
+      else
+        exit if cmd == "exit"
+        hint = "(💡  #{answer})".colorize(:light_yellow) if i >= 2
+        puts "Ce n'est pas la bonne commande. #{hint}" if !cmd || cmd.strip != answer
+      end
+      i += 1
     end
 
   end

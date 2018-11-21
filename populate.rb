@@ -26,6 +26,7 @@ def new_user_class user
       @parent_dir = $users_dir
       @name = user[:name]
       @slug = user[:name].downcase
+      @parent_dir = $analyses_dir
       @list = [
         {name: "Prochaine analyse", slug: "prochaine-analyse", removable: true, locked: false, content: "Prochaine analyse: #{rand(t1..t2)}", kind: :file, editable: true},
         {name: "Dernière analyse", slug: 'derniere-analyse', removable: false, locked: false, content: faker_analyse(user), kind: :file, editable: true}
