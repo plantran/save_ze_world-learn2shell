@@ -115,6 +115,14 @@ class FakeDir
 
   end
 
+  def hint
+
+  end
+
+  def mail args
+    puts "La commande a mal été formulée."
+  end
+
   protected
   def validate_path args
     if args.empty?

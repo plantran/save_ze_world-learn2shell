@@ -72,8 +72,10 @@ class Hint
   def after_edit_analyse
     h = "\n\n"
     h += "💡  Super, tu es maintenant intraçable sur le système informatique alien"
-    h += " et libre de te déplacer où tu veux.\n Tu vas pouvoir commencer à détruire le vaisseau à distance...\n"
-    h += "    Pour voir ce que tu peux faire, tape la commande " + "aide".italic + ". "
+    h += "    et libre de te déplacer où tu veux.\n Tu vas pouvoir commencer à détruire le vaisseau à distance...\n"
+    h += "    Pour voir ce que tu peux faire, tape la commande " + "aide".italic + ". \n"
+    h += "    Tu peux aussi taper la commande " + "hint".italic + " dans chaque dossier pour\n"
+    h += "    voir ce que tu peux faire !"
     h += "\n-----------\n\n"
   end
 end

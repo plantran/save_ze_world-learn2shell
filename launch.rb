@@ -2,7 +2,6 @@
 
 # TODO: CTRL + C
 # TODO: EN | FR
-# TODO: only for camelize and constantize
 
 require 'tty-prompt'
 require 'tty-cursor'
@@ -146,6 +145,10 @@ class Shell
       access_admin
     when 'destruction'
       $current_dir.destroy_ship
+    when 'hint'
+      $current_dir.hint
+    when 'mail'
+      $current_dir.mail(cmd_args)
     else
       puts "La commande a mal été formulée."
     end
@@ -167,6 +170,6 @@ class Shell
 end
 
 
-Tuto.new
+# Tuto.new
 @shell = Shell.new
 @shell.display
