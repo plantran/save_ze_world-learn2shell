@@ -1,4 +1,4 @@
-source 'https://rubygems.org' do
+source 'http://rubygems.org' do
   gem 'tty-prompt'
   gem 'activesupport', '~> 5.0'
   gem 'whirly'
