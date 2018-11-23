@@ -1,6 +1,6 @@
 def faker_analyse user
-  f = "adresse = #{user[:address]}"
-  f += "telephone = #{user[:phone]}"
+  f = "adresse = #{user[:address]}\n"
+  f += "telephone = #{user[:phone]}\n"
   f += "age = #{user[:age]}\n"
   f += "numero de carte bleue = #{user[:code_cb]}\n"
   f += "groupe sanguin = #{user[:blood]}\n"
