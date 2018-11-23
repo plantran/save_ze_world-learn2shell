@@ -1,3 +1,5 @@
+require_relative '_base'
+
 class HomeDir < FakeDir
   def initialize
     @path = "home"

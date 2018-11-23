@@ -1,3 +1,5 @@
+require_relative '_base'
+
 def populate_admins
   $admins.each do |a|
     klass_name = "Admin#{a[:name].camelize}"

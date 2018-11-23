@@ -1,3 +1,5 @@
+require_relative '_base'
+
 class AnalysesDir < FakeDir
   attr_accessor :list, :path
 

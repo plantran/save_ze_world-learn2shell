@@ -20,7 +20,7 @@ require 'securerandom'
 
 
 
-Faker::Config.locale = 'fr'
+# Faker::Config.locale = 'fr'
 $prompt = TTY::Prompt.new(interrupt: :noop)
 # I18n.config.available_locales = :en
 # I18n.config.available_locales = :fr

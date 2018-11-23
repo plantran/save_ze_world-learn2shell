@@ -1,3 +1,5 @@
+require_relative '_base'
+
 class AdminPwdDir < FakeDir
   def initialize
     @path = "admin"

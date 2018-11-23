@@ -1,5 +1,3 @@
-include Curses
-
 def screen_clear
   system "clear"
 end
