@@ -1,3 +1,5 @@
+require_relative '_base'
+
 class User < FakeDir
   attr_reader :name, :slug, :path
   attr_accessor :age, :blood, :card, :list, :parent_dir

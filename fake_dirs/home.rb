@@ -1,3 +1,4 @@
+require_relative '_base'
 class HomeDir < FakeDir
   def initialize
     @path = "home"
@@ -9,12 +10,5 @@ class HomeDir < FakeDir
     ]
     @list.each { |l| l[:target].parent_dir = self if l[:target]}
     $admin_part_dir.parent_dir = self
-  end
-
-  def hint
-    puts "\n\n"
-    puts "💡  Conseil : Dans ce dossier, tu vas pouvoir te balader dans le système informatique du vaisseau.\n"
-    puts "   Tape les commandes ls et cd pour continuer."
-    puts "\n-----------\n"
   end
 end

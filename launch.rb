@@ -2,6 +2,7 @@
 
 # TODO: CTRL + C
 # TODO: EN | FR
+# TODO: only for camelize and constantize
 
 require 'tty-prompt'
 require 'tty-cursor'
@@ -20,7 +21,7 @@ require 'securerandom'
 
 
 
-Faker::Config.locale = 'fr'
+# Faker::Config.locale = 'fr'
 $prompt = TTY::Prompt.new(interrupt: :noop)
 # I18n.config.available_locales = :en
 # I18n.config.available_locales = :fr
@@ -145,10 +146,6 @@ class Shell
       access_admin
     when 'destruction'
       $current_dir.destroy_ship
-    when 'hint'
-      $current_dir.hint
-    when 'mail'
-      $current_dir.mail(cmd_args)
     else
       puts "La commande a mal été formulée."
     end

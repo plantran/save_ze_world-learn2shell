@@ -1,4 +1,4 @@
-include Curses
+# include Curses
 
 def screen_clear
   system "clear"

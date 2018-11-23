@@ -1,3 +1,24 @@
+require_relative '_base'
+class AdminDir < FakeDir
+  def edit args
+    elem = @list.select { |l| l[:slug] == args.first and l[:kind] == :file }
+    if !elem.blank?
+      filename = args.first.strip
+      File.open(filename, "w+") {|f| f.puts elem.first[:content].split("\n").map {|l| l} }
+      system "nano -t #{filename}"
+      f = File.read(filename)
+      new_cont = f.split.first
+      unless !new_cont || new_cont.empty?
+        elem.first[:content] = new_cont
+        @password = new_cont
+      end
+      File.delete(filename) if File.exist?(filename)
+    else
+      puts "Le fichier n'existe pas ou n'est pas un fichier."
+    end
+  end
+end
+
 def populate_admins
   $admins.each do |a|
     klass_name = "Admin#{a[:name].camelize}"
@@ -18,46 +39,11 @@ def populate_admins
   end
 end
 
-class AdminDir < FakeDir
-  def edit args
-    elem = @list.select { |l| l[:slug] == args.first and l[:kind] == :file }
-    if !elem.blank?
-      filename = args.first.strip
-      File.open(filename, "w+") {|f| f.puts elem.first[:content].split("\n").map {|l| l} }
-      system "nano -t #{filename}"
-      f = File.read(filename)
-      new_cont = f.split.first
-      unless !new_cont || new_cont.empty?
-        elem.first[:content] = new_cont
-        @password = new_cont
-      end
-      File.delete(filename) if File.exist?(filename)
-    else
-      puts "Le fichier n'existe pas ou n'est pas un fichier."
-    end
-  end
-
-  def hint
-    puts "\n\n"
-    puts "💡  Conseil : Dans le dossier d'un administrateur, tu éditer son mot de passe."
-    puts "\n-----------\n"
-  end
-end
-
-
-
 class PasswordsDir < FakeDir
   def initialize
     @path = "Mots de passe"
     @list = []
     set_list
-  end
-
-  def hint
-    puts "\n\n"
-    puts "💡  Conseil : C'est dans ce dossier que tu vas pouvoir trouver les mots de passe des\n"
-    puts "   des administrateurs pour pouvoir entrer dans leur dossier pour la première fois."
-    puts "\n-----------\n"
   end
 
   private
@@ -96,13 +82,6 @@ class AdminsDir < FakeDir
     @list.each { |l| l[:target] = "Admin#{l[:name]}".constantize.new}
     @list.each { |l| l[:target].parent_dir = self }
   end
-
-  def hint
-    puts "\n\n"
-    puts "💡  Conseil : Ici, tu peux accéder au dossier personnel des administrateurs...\n"
-    puts "   ... Si tu as le bon mot de passe."
-    puts "\n-----------\n"
-  end
 end
 
 
@@ -117,13 +96,6 @@ class SecurityDir < FakeDir
       {name: "Admins", slug: "admins", locked: false, removable: false, kind: :dir, target: $admins_dir},
     ]
     @list.each { |l| l[:target].parent_dir = self }
-  end
-
-  def hint
-    puts "\n\n"
-    puts "💡  Conseil : Dans ce dossier, tu peux aller changer le mot de passe des administrateurs\n"
-    puts "   pour qu'ils ne puissent plus se connecter à leur session."
-    puts "\n-----------\n"
   end
 
 end
