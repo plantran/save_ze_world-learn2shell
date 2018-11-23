@@ -1,4 +1,5 @@
 require_relative '_base'
+
 class AnalysesDir < FakeDir
   attr_accessor :list, :path
 
@@ -48,6 +49,13 @@ class AnalysesDir < FakeDir
     @list = set_list
     @path = "analyses"
     set_parent_dir
+  end
+
+  def hint
+    puts "\n\n"
+    puts "💡  Conseil : Dans ce dossier, tu peux retrouver tous les utilisateurs sur qui le vaisseau \n"
+    puts "   possède des données personnelles qu'il vaudrait mieux voir disparaître !"
+    puts "\n-----------\n"
   end
 
   private

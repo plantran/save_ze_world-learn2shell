@@ -146,6 +146,10 @@ class Shell
       access_admin
     when 'destruction'
       $current_dir.destroy_ship
+    when 'hint'
+      $current_dir.hint
+    when 'mail'
+      $current_dir.mail(cmd_args)
     else
       puts "La commande a mal été formulée."
     end

@@ -1,10 +1,18 @@
 require_relative '_base'
+
 class AdminPwdDir < FakeDir
   def initialize
     @path = "admin"
     @list = [
       {name: "Mot de passe", slug: ".mdp", locked: true, removable: false, hidden: true, editable: false, kind: :file, content: "bc1a8fb"}
     ]
+  end
+
+  def hint
+    puts "\n\n"
+    puts "💡  Conseil : Dans ce dossier, tu vas pouvoir trouver le mot de passe pour accéder à \n"
+    puts "   l'administration de la gestion du vaisseau. Les fichiers sont peut-être cachés..."
+    puts "\n-----------\n"
   end
 end
 
@@ -104,6 +112,16 @@ class AdminPartDir < FakeDir
     end
   end
 
+  def hint
+    puts "\n\n"
+    puts "💡  Conseil : Dans la partie de gestion du vaisseau, tu vas pouvoir faire en sorte de le détruire !\n"
+    puts "   Pour cela, il va falloir faire en sorte que les composants du vaisseau soient en mauvais état !\n"
+    puts "   En éditant le fichier correspondant en augmentant la température au max, en mettant le moins d'aération \n"
+    puts "   possible et en annulant le système de refroidissement, tu vas pouvoir constater l'état du vaisseau avec la \n"
+    puts "   commande `status` et tenter de le détruire avec la commande `destruction`"
+    puts "\n-----------\n"
+  end
+
   private
 
   def set_emails_content elem
@@ -116,6 +134,13 @@ class AdminPartDir < FakeDir
     elem[:content] += "Température des réacteurs = 90\n"
     elem[:content] += "Système de refroidissement enclanché = Oui\n"
     elem[:content] += "Aérations ouvertes = 10\n"
+  end
+
+  def mails_sent?
+    $planetes_dir.list.each do |l|
+      return false unless l[:target].emailed
+    end
+    true
   end
 
 end
