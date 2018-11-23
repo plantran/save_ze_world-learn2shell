@@ -80,7 +80,7 @@ class AdminPartDir < FakeDir
   end
 
   def destroy_ship
-    (puts "Il faut d'abord envoyer un mail aux analystes des planètes pour les faire revenir sur le vaisseau." ; return) if !mails_sent?
+    (puts "Il faut d'abord envoyer un mail aux analyseurs des planètes pour les faire revenir sur le vaisseau." ; return) if !mails_sent?
     if @destroyed
       puts "\nLe vaisseau a déjà été détruit.\n"
     elsif @temperature_des_reacteurs >= 400 && !@systeme_de_refroidissement_enclanche && @aerations_ouvertes <= 1

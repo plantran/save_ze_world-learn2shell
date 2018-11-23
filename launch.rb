@@ -11,10 +11,10 @@ require 'active_support/all'
 require 'artii'
 require 'whirly'
 require 'paint'
-require "curses"
+# require "curses"
 require 'colorize'
 require 'time'
-require 'faker'
+# require 'faker'
 require 'securerandom'
 # require "i18n"
 
@@ -138,7 +138,7 @@ class Shell
     when 'edit'
       $current_dir.edit(cmd_args)
     when 'aide'
-      system "less aide.less"
+      system "less aide"
     when 'status'
       $current_dir.status
     when 'admin'
@@ -170,6 +170,6 @@ class Shell
 end
 
 
-# Tuto.new
+Tuto.new
 @shell = Shell.new
 @shell.display

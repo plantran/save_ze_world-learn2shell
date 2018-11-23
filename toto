@@ -1,0 +1,4 @@
+export PATH=$PATH:/Users/plantran/.gem/ruby/2.0.0/bin
+
+bundle install --path $HOME/.gem/ruby/2.0.0
+gem install bundler --source http://rubygems.org --user
