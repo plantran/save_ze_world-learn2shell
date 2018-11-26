@@ -6,7 +6,6 @@
 
 require 'tty-prompt'
 require 'tty-cursor'
-require 'tty-table'
 require 'rubygems'
 require 'active_support/all'
 require 'artii'
